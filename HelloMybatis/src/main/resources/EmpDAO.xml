@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.onisun.demo1.DAO.EmpDao">
+    <select id="getEmpByEmpno" resultType="com.onisun.demo1.bean.Emp">
+        select * from emp where empno = #{empno}
+    </select>
+
+    <update id="updataEmp" >
+        update emp set ename = #{ename} where empno = #{empno}
+    </update>
+
+    <delete id="deleteEmp">
+        delete from emp where empno = #{empno}
+    </delete>
+
+    <insert id="insertEmp">
+        insert into emp(ename,job) values (#{ename},#{job})
+    </insert>
+</mapper>
