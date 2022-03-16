@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.onisun.demo2.dao.Emp2Dao">
+<!--第一种方式：将实体类对象，写成对象.属性的方式-->
+<!--
+
+    <resultMap id="myEmp2" type="com.onisun.demo2.bean.Emp2">
+        <result column="deptno" property="dept.deptno"/>
+        <result column="loc" property="dept.loc"/>
+        <result column="dname" property="dept.dname"/>
+    </resultMap>
+    <select id="selectEmpByEmpno" resultMap="myEmp2">
+        select * from emp left join dept on emp.deptno = dept.deptno where empno = #{empno}
+    </select>
+-->
+
+    <!--第2种方式：使用association-->
+    <resultMap id="myEmp2" type="com.onisun.demo2.bean.Emp2">
+        <id column="empno" property="empno"/>
+        <result column="ename" property="ename"/>
+        <result column="job" property="job"/>
+        <result column="mgr" property="mgr"/>
+        <result column="hiredate" property="hiredate"/>
+        <result column="sal" property="sal"/>
+        <result column="comm" property="comm"/>
+<!--      property 表示类中的一个属性 ，javaType表示这个属性是什么类型  -->
+        <association property="dept" javaType="com.onisun.demo2.bean.Dept">
+            <id column="deptno" property="deptno"/>
+            <result column="dname" property="dname"/>
+            <result column="loc" property="loc"/>
+        </association>
+    </resultMap>
+    <select id="selectEmpByEmpno" resultMap="myEmp2">
+        select * from emp left join dept on emp.deptno = dept.deptno where empno = #{empno}
+    </select>
+
+</mapper>

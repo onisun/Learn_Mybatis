@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.onisun.demo2.dao.EmpDao">
+
+<!--    返回类型是map结构  会把查询结构的字段值作为key，结果作为value-->
+<!--    返回的map集合包含多个对象，此时没有key会报错。
+        需要在Dao的方法上添加注解@Mapkey 来标识哪个属性值作为key -->
+    <select id="selectAll2" resultType="map" >
+        select * from emp
+    </select>
+
+<!--   返回map集合，只有一个对象 -->
+    <select id="getEmpByEmpnoResultMap" resultType="map" >
+        select * from emp where empno = #{empno}
+    </select>
+<!--    自定义map结构-->
+    <select id="selectEmpByEmpnoAndSal3" resultType="com.onisun.demo2.bean.Emp" >
+        select * from emp where empno = #{empno} and sal > #{sal}
+    </select>
+
+    <!-- 如果参数不是一个对象，而是多个基本数据类型或者引用数据类型，#{属性名/参数名}无法取到值
+    ，只能通过#{arg0,arg1...}  #{param0,param1...}
+    如果想要能够通过参数名获取到值，可以在接口参数中定义@Param("value")
+    -->
+    <select id="selectEmpByEmpnoAndSal2" resultType="com.onisun.demo2.bean.Emp" >
+        select * from emp where empno = #{empno} and sal > #{sal}
+    </select>
+
+    <select id="selectEmpByEmpnoAndSal" resultType="com.onisun.demo2.bean.Emp" >
+        select * from emp where empno = #{empno} and sal > #{sal}
+    </select>
+
+<!--    使用的#{} SQL是： select * from emp where empno = ?   预处理没有SQL注入问题
+    使用${} SQL是：select * from emp where empno = 7369    拼接的，有SQL注入问题
+    ${}有自己的使用场景，比如：当需要动态传入表名列名的时候
+    select * from ${arg0} where empno = ${arg1}
+    -->
+    <select id="getEmpByEmpno" resultType="com.onisun.demo2.bean.Emp" >
+        select * from emp where empno = #{empno}
+    </select>
+
+
+    <!--    ResultType 表示返回结果的类型，此类型只能返回单一的对象
+            当返回的结果是一个集合时，并不需要ResultMap，只需要ResultType指定集合中的元素类即可
+     -->
+    <select id="selectAll" resultType="com.onisun.demo2.bean.Emp">
+        select * from emp
+    </select>
+
+    <insert id="insertEmp" useGeneratedKeys="true" keyProperty="">
+        insert into emp(ename,job,sal) values(#{ename},#{job},#{sal})
+    </insert>
+
+
+    <select id="getEmpByEmpnoAndName" resultType="com.onisun.demo2.bean.Emp">
+        select * from emp where empno = #{empno} and ename = #{ename}
+    </select>
+
+    <select id="getEmpEnameAndSal" resultType="com.onisun.demo2.bean.Emp">
+        select * from emp where ename = #{ename} and sal > #{sal}
+    </select>
+
+</mapper>

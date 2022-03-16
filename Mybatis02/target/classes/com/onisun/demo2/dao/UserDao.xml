@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.onisun.demo2.dao.UserDao">
+
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+--     无论是否配置了驼峰标识的识别setting，都需要在sql语句中写表的列名。
+        insert into user(user_name) values (#{userName})
+    </insert>
+
+
+<!--    ResultType 表示返回结果的类型，此类型只能返回单一的对象
+        当返回的结果是一个集合时，并不需要ResultMap，只需要ResultType指定集合中的元素类即可
+ -->
+    <select id="queryAll" resultType="com.onisun.demo2.bean.User" >
+        select id,user_name from user
+    </select>
+</mapper>

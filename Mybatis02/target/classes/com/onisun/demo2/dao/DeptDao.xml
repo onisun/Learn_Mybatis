@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.onisun.demo2.dao.DeptDao">
+
+    <resultMap id="myDept" type="com.onisun.demo2.bean.Dept">
+        <id property="deptno" column="deptno"/>
+        <result property="dname" column="dname"/>
+        <result property="loc" column="loc"/>
+
+        <collection property="emps" ofType="com.onisun.demo2.bean.Emp2">
+            <id column="empno" property="empno"/>
+            <result column="ename" property="ename"/>
+            <result column="job" property="job"/>
+            <result column="mgr" property="mgr"/>
+            <result column="hiredate" property="hiredate"/>
+            <result column="sal" property="sal"/>
+            <result column="comm" property="comm"/>
+        </collection>
+    </resultMap>
+    <select id="getDeptByDeptno" resultMap="myDept">
+        select * from dept left join emp on dept.deptno = emp.deptno where dept.deptno = #{deptno}
+    </select>
+
+</mapper>
