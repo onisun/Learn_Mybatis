@@ -24,4 +24,10 @@
         select * from dept left join emp on dept.deptno = emp.deptno where dept.deptno = #{deptno}
     </select>
 
+
+
+<!--    作为分步查询中的子查询-->
+    <select id="getDeptByStep" resultType="com.onisun.demo2.bean.Dept">
+        select * from dept where deptno = #{deptno}
+    </select>
 </mapper>

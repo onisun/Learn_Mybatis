@@ -1,6 +1,7 @@
 package com.onisun.demo2.dao;
 
 import com.onisun.demo2.bean.Dept;
+import com.onisun.demo2.bean.Emp2;
 
 import java.util.List;
 
@@ -11,4 +12,8 @@ import java.util.List;
 public interface DeptDao {
 
     Dept getDeptByDeptno(Integer deptno);
+
+    Dept getDeptByStep(Integer deptno);
+
+
 }

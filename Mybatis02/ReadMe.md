@@ -1,3 +1,9 @@
+##  Mybatis
+
+mybatis官方参考文档 :
+
+https://mybatis.org/mybatis-3/zh/index.html
+
 ### ResultType
 
 ```xml
@@ -420,3 +426,171 @@ public void test14() {
     sqlSession.close();
 }
 ```
+
+
+
+
+
+### 分步查询
+
+Emp2Dao.xml
+
+```xml
+<!--    分步查询  两条查询语句，将另外一条查询语句的结果作为表，再使用查询语句进行二次查询 -->
+    <select id="selectEmpByStep" resultMap="empStep">
+        select * from emp where empno = #{empno}
+    </select>
+
+    <resultMap id="empStep" type="com.onisun.demo2.bean.Emp2">
+        <id column="empno" property="empno"/>
+        <result column="ename" property="ename"/>
+        <result column="job" property="job"/>
+        <result column="mgr" property="mgr"/>
+        <result column="hiredate" property="hiredate"/>
+        <result column="sal" property="sal"/>
+        <result column="comm" property="comm"/>
+<!--        这里select里面引用另外一条查询语句
+            这里的column 指定哪个列相关联
+      -->
+        <association property="dept" select="com.onisun.demo2.dao.DeptDao.getDeptByStep" column="deptno"/>
+    </resultMap>
+```
+
+
+
+DeptDao.xml
+
+```xml
+<!--    作为分步查询中的子查询-->
+    <select id="getDeptByStep" resultType="com.onisun.demo2.bean.Dept">
+        select * from dept where deptno = #{deptno}
+    </select>
+```
+
+
+
+DeptDao.java
+
+```java
+Dept getDeptByStep(Integer deptno);
+```
+
+Emp2Dao.java
+
+```java
+Emp2 selectEmpByStep(Integer empno);
+```
+
+Test
+
+```java
+@Test
+public void test15() {
+    //分步查询
+    SqlSession sqlSession = sqlSessionFactory.openSession();
+    Emp2Dao mapper = sqlSession.getMapper(Emp2Dao.class);
+
+    Emp2 emp2 = mapper.selectEmpByStep(7369);
+    System.out.println(emp2);
+
+    sqlSession.commit();
+    sqlSession.close();
+}
+```
+
+
+
+### 延迟加载
+
+​	当我们在进行表关联的时候，有可能在查询结果的时候不需要关联对象的属性值，那么此时可以通过延迟加载来实现功能。在全局配置文件中添加如下属性
+
+mysql-config.xml
+
+```xml
+<!--        开启延迟加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+```
+
+
+
+如果设置了全局加载，但是希望在某一个sql语句查询的时候不适用延时策略，可以添加如下属性：fetchType
+
+```xml
+<association property="dept" 
+             select="com.mashibing.dao.DeptDao.getDeptAndEmpsBySimple" column="deptno"
+             fetchType="eager"/>
+```
+
+
+
+### 动态sql
+
+动态 SQL 是 MyBatis 的强大特性之一。如果你使用过 JDBC 或其它类似的框架，你应该能理解根据不同条件拼接 SQL 语句有多痛苦，例如拼接时要确保不能忘记添加必要的空格，还要注意去掉列表最后一个列名的逗号。利用动态 SQL，可以彻底摆脱这种痛苦。
+
+-   if
+-   choose (when, otherwise)
+-   trim (where, set)
+-   foreach
+
+#### if
+
+```xml
+<!--    如果没有匹配条件，SQL语句会变成：select * from emp where
+        如果两个条件都满足 SQL语句会变成： select * from emp where ename = ? sal > ?
+        如果在sal前面加上and   SQL : select * from emp where and sal > ?
+        这个查询也会失败。这个问题不能简单地用条件元素来解决。这个问题是如此的难以解决，
+        以至于解决过的人不会再想碰到这种问题。
+MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场景中，可以对其进行自定义以符合需求。
+而这，只需要一处简单的改动  使用<where>
+    -->
+    <select id="selectEmp" resultType="com.onisun.demo2.bean.Emp2">
+        select * from emp where
+        <if test="ename != null">
+              ename = #{ename}
+        </if>
+        <if test="sal != null">
+              sal > #{sal}
+        </if>
+    </select>
+```
+
+
+
+```xml
+<!--    where 元素只会在子元素返回任何内容的情况下才插入 “WHERE” 子句。
+而且，若子句的开头为 “AND” 或 “OR”，where 元素也会将它们去除。-->
+    <select id="selectEmp2" resultType="com.onisun.demo2.bean.Emp2">
+        select * from emp
+        <where>
+            <if test="ename != null">
+                and ename = #{ename}
+            </if>
+            <if test="sal != null">
+                and sal > #{sal}
+            </if>
+        </where>
+
+    </select>
+```
+
+#### foreach
+
+​	动态 SQL 的另一个常见使用场景是对集合进行遍历（尤其是在构建 IN 条件语句的时候）
+
+```xml
+<!--foreach是对集合进行遍历
+    collection="deptnos"  指定要遍历的集合
+    close="" 表示以什么结束
+    index="" 给定一个索引值
+    item=""  遍历的每一个元素的值
+    open=""  表示以什么开始
+    separator="" 表示多个元素的分隔符
+    -->
+    <select id="getEmpByDeptnos" resultType="Emp">
+        select * from emp where deptno in 
+        <foreach collection="deptnos" close=")" index="idx" item="deptno" open="(" separator=",">
+            #{deptno}
+        </foreach>
+    </select>
+```
+

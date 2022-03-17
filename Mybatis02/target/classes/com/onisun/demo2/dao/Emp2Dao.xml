@@ -37,4 +37,73 @@
         select * from emp left join dept on emp.deptno = dept.deptno where empno = #{empno}
     </select>
 
+
+<!--    分步查询  两条查询语句，将另外一条查询语句的结果作为表，再使用查询语句进行二次查询 -->
+    <select id="selectEmpByStep" resultMap="empStep">
+        select * from emp where empno = #{empno}
+    </select>
+
+    <resultMap id="empStep" type="com.onisun.demo2.bean.Emp2">
+        <id column="empno" property="empno"/>
+        <result column="ename" property="ename"/>
+        <result column="job" property="job"/>
+        <result column="mgr" property="mgr"/>
+        <result column="hiredate" property="hiredate"/>
+        <result column="sal" property="sal"/>
+        <result column="comm" property="comm"/>
+<!--        这里select里面引用另外一条查询语句
+            这里的column 指定哪个列相关联
+      -->
+        <association property="dept" select="com.onisun.demo2.dao.DeptDao.getDeptByStep" column="deptno"/>
+    </resultMap>
+
+
+<!--    如果没有匹配条件，SQL语句会变成：select * from emp where
+        如果两个条件都满足 SQL语句会变成： select * from emp where ename = ? sal > ?
+        如果在sal前面加上and   SQL : select * from emp where and sal > ?
+        这个查询也会失败。这个问题不能简单地用条件元素来解决。这个问题是如此的难以解决，
+        以至于解决过的人不会再想碰到这种问题。
+MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场景中，可以对其进行自定义以符合需求。
+而这，只需要一处简单的改动  使用<where>
+    -->
+
+    <select id="selectEmp" resultType="com.onisun.demo2.bean.Emp2">
+        select * from emp where
+        <if test="ename != null">
+              ename = #{ename}
+        </if>
+        <if test="sal != null">
+              sal > #{sal}
+        </if>
+    </select>
+
+<!--    where 元素只会在子元素返回任何内容的情况下才插入 “WHERE” 子句。
+而且，若子句的开头为 “AND” 或 “OR”，where 元素也会将它们去除。-->
+    <select id="selectEmp2" resultType="com.onisun.demo2.bean.Emp2">
+        select * from emp
+        <where>
+            <if test="ename != null">
+                and ename = #{ename}
+            </if>
+            <if test="sal != null">
+                and sal > #{sal}
+            </if>
+        </where>
+
+    </select>
+
+    <!--foreach是对集合进行遍历
+    collection="deptnos"  指定要遍历的集合
+    close="" 表示以什么结束
+    index="" 给定一个索引值
+    item=""  遍历的每一个元素的值
+    open=""  表示以什么开始
+    separator="" 表示多个元素的分隔符
+    -->
+    <select id="selectEmp2ByDeptnos" resultType="com.onisun.demo2.bean.Emp2">
+        select * from emp where deptno in
+        <foreach collection="deptnos" index="idx" open="("  item="deptno"  close=")"  separator=",">
+            #{deptno}
+        </foreach>
+    </select>
 </mapper>

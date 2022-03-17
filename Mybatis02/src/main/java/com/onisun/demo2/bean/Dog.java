@@ -5,6 +5,7 @@ package com.onisun.demo2.bean;
  * @version 1.0
  */
 public class Dog {
+
     private Integer id;
     private String name;
     private Integer age;

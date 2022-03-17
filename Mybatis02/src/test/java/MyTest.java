@@ -9,9 +9,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Neo
@@ -211,6 +209,7 @@ public class MyTest {
         Emp2Dao mapper = sqlSession.getMapper(Emp2Dao.class);
 
         Emp2 emp2 = mapper.selectEmpByEmpno(7369);
+//        System.out.println(emp2.getEname());
         System.out.println(emp2);
 
         sqlSession.commit();
@@ -226,6 +225,69 @@ public class MyTest {
         Dept dept = mapper.getDeptByDeptno(10);
         System.out.println(dept);
 
+        sqlSession.commit();
+        sqlSession.close();
+    }
+
+    @Test
+    public void test15() {
+        //分步查询
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        Emp2Dao mapper = sqlSession.getMapper(Emp2Dao.class);
+
+        Emp2 emp2 = mapper.selectEmpByStep(7369);
+        System.out.println(emp2.getEname());
+
+        sqlSession.commit();
+        sqlSession.close();
+    }
+
+    @Test
+    public void test16() {
+        //动态sql if
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        Emp2Dao mapper = sqlSession.getMapper(Emp2Dao.class);
+
+        Emp2 emp = new Emp2();
+//        emp.setEname("SMITH");
+        emp.setSal(200.0);
+        List<Emp2> emp2 = mapper.selectEmp(emp);
+        for (Emp2 emp21 : emp2) {
+            System.out.println(emp21);
+        }
+
+        sqlSession.commit();
+        sqlSession.close();
+    }
+
+    @Test
+    public void test17() {
+        //动态sql where标签
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        Emp2Dao mapper = sqlSession.getMapper(Emp2Dao.class);
+
+        Emp2 emp = new Emp2();
+//        emp.setEname("SMITH");
+        emp.setSal(200.0);
+        List<Emp2> emp2 = mapper.selectEmp2(emp);
+        for (Emp2 emp21 : emp2) {
+            System.out.println(emp21);
+        }
+
+        sqlSession.commit();
+        sqlSession.close();
+    }
+
+    @Test
+    public void test18() {
+        //动态sql foreach标签
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        Emp2Dao mapper = sqlSession.getMapper(Emp2Dao.class);
+
+        List<Emp2> emp2 = mapper.selectEmp2ByDeptnos(Arrays.asList(10,20));
+        for (Emp2 emp21 : emp2) {
+            System.out.println(emp21);
+        }
         sqlSession.commit();
         sqlSession.close();
     }
